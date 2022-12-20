@@ -47,4 +47,10 @@ public class EmployeeController {
         request.getSession().setAttribute("employeeId", emp.getId());
         return Result.success(emp);
     }
+
+    @PostMapping("/logout")
+    public Result logout(HttpServletRequest request){
+        request.getSession().removeAttribute("employeeId");
+        return Result.success("退出成功");
+    }
 }
