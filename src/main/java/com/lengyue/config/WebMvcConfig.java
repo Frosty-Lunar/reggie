@@ -5,6 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
+/**
+ * webmvc 配置静态资源映射
+ *
+ * @author 陌年
+ * @date 2022/12/20
+ */
 @Configuration
 @Slf4j
 public class WebMvcConfig extends WebMvcConfigurationSupport {
