@@ -1,19 +1,21 @@
 package com.lengyue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lengyue.commons.Result;
 import com.lengyue.entity.Employee;
 import com.lengyue.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -67,5 +69,18 @@ public class EmployeeController {
         employee.setUpdateUser(employeeId);
         employeeService.save(employee);
         return Result.success("添加员工成功");
+    }
+
+    @GetMapping("/page")
+    public Result employeeList(@Param("page") int page, @Param("pageSize") int pageSize) {
+        log.info("page{}", page);
+        log.info("pageSize{}", pageSize);
+        Page<Employee> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        Page<Employee> employeePage = employeeService.page(pageInfo, queryWrapper);
+        Result result = new Result();
+        result.setCode(1);
+        result.setData(employeePage);
+        return result;
     }
 }
