@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 
 /**
@@ -49,8 +51,21 @@ public class EmployeeController {
     }
 
     @PostMapping("/logout")
-    public Result logout(HttpServletRequest request){
+    public Result<String> logout(HttpServletRequest request) {
         request.getSession().removeAttribute("employeeId");
         return Result.success("退出成功");
+    }
+
+    @PostMapping
+    public Result<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee) {
+        //默认密码123456
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        Long employeeId = (Long) request.getSession().getAttribute("employeeId");
+        employee.setCreateUser(employeeId);
+        employee.setUpdateUser(employeeId);
+        employeeService.save(employee);
+        return Result.success("添加员工成功");
     }
 }
