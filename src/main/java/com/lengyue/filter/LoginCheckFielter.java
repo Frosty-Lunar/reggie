@@ -2,7 +2,6 @@ package com.lengyue.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.lengyue.commons.Result;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;

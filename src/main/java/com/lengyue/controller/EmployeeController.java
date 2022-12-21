@@ -6,15 +6,14 @@ import com.lengyue.commons.Result;
 import com.lengyue.entity.Employee;
 import com.lengyue.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -31,6 +30,13 @@ public class EmployeeController {
     @Autowired
     EmployeeService employeeService;
 
+    /**
+     * 登录功能实现
+     *
+     * @param request  请求,主要用来将id存入session作用域
+     * @param employee 员工
+     * @return {@link Result}<{@link Employee}>
+     */
     @PostMapping("/login")
     public Result<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
         String password = employee.getPassword();
@@ -52,6 +58,12 @@ public class EmployeeController {
         return Result.success(emp);
     }
 
+    /**
+     * 注销登录
+     *
+     * @param request 请求,主要用于清理session中的id
+     * @return {@link Result}<{@link String}>
+     */
     @PostMapping("/logout")
     public Result<String> logout(HttpServletRequest request) {
         request.getSession().removeAttribute("employeeId");
@@ -75,12 +87,8 @@ public class EmployeeController {
     public Result employeeList(@Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name) {
         Page<Employee> pageInfo = new Page<>(page, pageSize);
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        if (name != null && !name.equals("null")) {
-            queryWrapper.like(Employee::getName, name);
-        }
+        queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName, name);
         Page<Employee> employeePage = employeeService.page(pageInfo, queryWrapper);
-        List<Employee> records = employeePage.getRecords();
-        records.forEach(it -> log.info(it.toString()));
         Result result = new Result();
         result.setCode(1);
         result.setData(employeePage);

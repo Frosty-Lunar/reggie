@@ -18,4 +18,4 @@ mybatis-plus:
 
   global-config:
     db-config:
-      id-type: auto
+      id-type: assign_id
