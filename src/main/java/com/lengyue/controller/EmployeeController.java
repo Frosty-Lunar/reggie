@@ -70,6 +70,13 @@ public class EmployeeController {
         return Result.success("退出成功");
     }
 
+    /**
+     * 添加员工
+     *
+     * @param request  请求,获得更改员工ID，即登录用户ID
+     * @param employee 员工
+     * @return {@link Result}<{@link String}>
+     */
     @PostMapping
     public Result<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee) {
         //默认密码123456
@@ -83,6 +90,14 @@ public class EmployeeController {
         return Result.success("添加员工成功");
     }
 
+    /**
+     * 分页查询列表
+     *
+     * @param page     页面
+     * @param pageSize 页面大小
+     * @param name     员工姓名
+     * @return {@link Result}
+     */
     @GetMapping("/page")
     public Result employeeList(@Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name) {
         Page<Employee> pageInfo = new Page<>(page, pageSize);
@@ -95,17 +110,28 @@ public class EmployeeController {
         return result;
     }
 
+    /**
+     * 根据ID查询员工
+     *
+     * @param id id
+     * @return {@link Result}
+     */
     @GetMapping("{id}")
     public Result employeeList(@PathVariable("id") Long id) {
-        log.info("id:{}", id);
         Employee employee = employeeService.getById(id);
-        log.info("Employee:{}", employee);
         Result result = new Result();
         result.setCode(1);
         result.setData(employee);
         return result;
     }
 
+    /**
+     * 更新员工
+     *
+     * @param request  请求
+     * @param employee 员工
+     * @return {@link Result}
+     */
     @PutMapping
     public Result updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
         Long employeeId = (Long) request.getSession().getAttribute("employeeId");
