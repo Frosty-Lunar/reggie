@@ -73,14 +73,36 @@ public class EmployeeController {
 
     @GetMapping("/page")
     public Result employeeList(@Param("page") int page, @Param("pageSize") int pageSize) {
-        log.info("page{}", page);
-        log.info("pageSize{}", pageSize);
         Page<Employee> pageInfo = new Page<>(page, pageSize);
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         Page<Employee> employeePage = employeeService.page(pageInfo, queryWrapper);
+        List<Employee> records = employeePage.getRecords();
+        records.forEach(it->log.info(it.toString()));
         Result result = new Result();
         result.setCode(1);
         result.setData(employeePage);
         return result;
+    }
+    @GetMapping("{id}")
+    public Result employeeList(@PathVariable("id") Long id) {
+        log.info("id:{}",id);
+        Employee employee = employeeService.getById(id);
+        log.info("Employee:{}",employee);
+        Result result = new Result();
+        result.setCode(1);
+        result.setData(employee);
+        return result;
+    }
+
+    @PutMapping
+    public Result updateEmployee(HttpServletRequest request,@RequestBody Employee employee) {
+        Long employeeId = (Long) request.getSession().getAttribute("employeeId");
+        employee.setUpdateUser(employeeId);
+        employee.setUpdateTime(LocalDateTime.now());
+        boolean flag = employeeService.updateById(employee);
+        if (flag) {
+            return Result.success("修改成功");
+        }
+        return Result.error("修改失败");
     }
 }
