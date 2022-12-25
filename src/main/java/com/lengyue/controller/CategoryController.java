@@ -42,11 +42,9 @@ public class CategoryController {
 
     @DeleteMapping
     public Result<String> deleteCategoryById(@Param("id") Long id) {
-        boolean flag = categoryService.removeById(id);
-        if (flag) {
-            return Result.success("删除成功！");
-        }
-        return Result.error("删除失败！");
+        categoryService.removeById(id);
+        return Result.success("分类信息删除成功");
+
     }
 
     @PutMapping

@@ -1,5 +1,6 @@
 package com.lengyue.commons;
 
+import com.lengyue.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,5 +33,16 @@ public class GlobalExceptionHandler {
             return Result.error(message);
         }
         return Result.error("未知异常");
+    }
+
+    /**
+     * 异常处理程序
+     *
+     * @param ex 变量
+     * @return {@link Result}<{@link String}>
+     */
+    @ExceptionHandler(CustomException.class)
+    public Result<String> exceptionHandler(CustomException ex) {
+        return Result.error(ex.getMessage());
     }
 }
