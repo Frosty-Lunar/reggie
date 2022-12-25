@@ -94,15 +94,12 @@ public class EmployeeController {
      * @return {@link Result}
      */
     @GetMapping("/page")
-    public Result employeeList(@Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name) {
+    public Result<Page> employeeList(@Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name) {
         Page<Employee> pageInfo = new Page<>(page, pageSize);
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName, name);
         Page<Employee> employeePage = employeeService.page(pageInfo, queryWrapper);
-        Result result = new Result();
-        result.setCode(1);
-        result.setData(employeePage);
-        return result;
+        return Result.success(employeePage);
     }
 
     /**
