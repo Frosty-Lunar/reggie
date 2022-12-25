@@ -81,11 +81,6 @@ public class EmployeeController {
     public Result<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee) {
         //默认密码123456
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        Long employeeId = (Long) request.getSession().getAttribute("employeeId");
-        employee.setCreateUser(employeeId);
-        employee.setUpdateUser(employeeId);
         employeeService.save(employee);
         return Result.success("添加员工成功");
     }
@@ -133,10 +128,7 @@ public class EmployeeController {
      * @return {@link Result}
      */
     @PutMapping
-    public Result updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
-        Long employeeId = (Long) request.getSession().getAttribute("employeeId");
-        employee.setUpdateUser(employeeId);
-        employee.setUpdateTime(LocalDateTime.now());
+    public Result updateEmployee(@RequestBody Employee employee) {
         boolean flag = employeeService.updateById(employee);
         if (flag) {
             return Result.success("修改成功");
