@@ -1,6 +1,7 @@
 package com.lengyue.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.lengyue.commons.BaseContext;
 import com.lengyue.commons.Result;
 import org.springframework.util.AntPathMatcher;
 
@@ -33,7 +34,9 @@ public class LoginCheckFielter implements Filter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (request.getSession().getAttribute("employeeId") != null) {
+        Long employeeId = (Long) request.getSession().getAttribute("employeeId");
+        if (employeeId != null) {
+            BaseContext.setCurrentId(employeeId);
             filterChain.doFilter(request, response);
             return;
         }

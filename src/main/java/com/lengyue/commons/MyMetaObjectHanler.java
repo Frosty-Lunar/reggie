@@ -14,8 +14,8 @@ public class MyMetaObjectHanler implements MetaObjectHandler {
         log.info(metaObject.toString());
         metaObject.setValue("createTime", LocalDateTime.now());
         metaObject.setValue("updateTime", LocalDateTime.now());
-        metaObject.setValue("createUser", 1L);
-        metaObject.setValue("updateUser", 1L);
+        metaObject.setValue("createUser", BaseContext.getCurrentId());
+        metaObject.setValue("updateUser", BaseContext.getCurrentId());
     }
 
     @Override
@@ -24,6 +24,6 @@ public class MyMetaObjectHanler implements MetaObjectHandler {
         log.info(metaObject.toString());
 
         metaObject.setValue("updateTime",LocalDateTime.now());
-        metaObject.setValue("updateUser",1L);
+        metaObject.setValue("updateUser",BaseContext.getCurrentId());
     }
 }
