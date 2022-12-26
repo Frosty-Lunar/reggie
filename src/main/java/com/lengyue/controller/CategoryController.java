@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -34,7 +35,7 @@ public class CategoryController {
     }
 
     @GetMapping("/page")
-    public Result<Page> queryCategoryByPage(@Param("page") int page, @Param("pageSize") int pageSize) {
+    public Result<Page<Category>> queryCategoryByPage(@Param("page") int page, @Param("pageSize") int pageSize) {
         Page<Category> pages = new Page<>(page, pageSize);
         LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByAsc(Category::getSort);
@@ -59,9 +60,10 @@ public class CategoryController {
     }
 
     @GetMapping("/list")
-    public Result<List> listCategory(@Param("type") int type) {
+    public Result<List<Category>> listCategory(@Param("type") int type) {
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Category::getType, type);
+        lambdaQueryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
         List<Category> list = categoryService.list(lambdaQueryWrapper);
         return Result.success(list);
     }
