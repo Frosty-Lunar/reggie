@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 类别控制器
@@ -54,5 +56,13 @@ public class CategoryController {
             return Result.success("更新成功！");
         }
         return Result.error("更新失败！");
+    }
+
+    @GetMapping("/list")
+    public Result<List> listCategory(@Param("type") int type) {
+        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Category::getType, type);
+        List<Category> list = categoryService.list(lambdaQueryWrapper);
+        return Result.success(list);
     }
 }

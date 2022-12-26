@@ -28,11 +28,9 @@ public class LoginCheckFielter implements Filter {
                 "/employee/logout",
                 "/backend/**",
                 "front/**",
-                "/common/**",
-                "backend/**"
         };
-        String requestURI = request.getRequestURI();
-        if (checkURI(sideTrips, requestURI)) {
+        String requestUri = request.getRequestURI();
+        if (checkUri(sideTrips, requestUri)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -45,10 +43,10 @@ public class LoginCheckFielter implements Filter {
         response.getWriter().write(JSON.toJSONString(Result.error("NOTLOGIN")));
     }
 
-    public boolean checkURI(String[] sideTrips, String requestURI) {
+    public boolean checkUri(String[] sideTrips, String requestUri) {
         for (String sideTrip : sideTrips) {
             AntPathMatcher matcher = new AntPathMatcher();
-            boolean match = matcher.match(sideTrip, requestURI);
+            boolean match = matcher.match(sideTrip, requestUri);
             if (match) {
                 return true;
             }

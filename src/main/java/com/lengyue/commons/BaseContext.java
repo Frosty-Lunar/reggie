@@ -7,7 +7,7 @@ package com.lengyue.commons;
  * @date 2022/12/25
  */
 public class BaseContext {
-    private static ThreadLocal<Long> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Long> threadLocal = new ThreadLocal<>();
 
     /**
      * 设置当前id
@@ -20,5 +20,8 @@ public class BaseContext {
 
     public static Long getCurrentId() {
         return threadLocal.get();
+    }
+    public static void remove(){
+        threadLocal.remove();
     }
 }
