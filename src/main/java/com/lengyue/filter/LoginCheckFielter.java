@@ -27,7 +27,9 @@ public class LoginCheckFielter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "front/**"
+                "front/**",
+                "/common/**",
+                "backend/**"
         };
         String requestURI = request.getRequestURI();
         if (checkURI(sideTrips, requestURI)) {
