@@ -16,9 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -91,5 +89,32 @@ public class DishController {
     public Result<String> update(@RequestBody DishDto dishDto) {
         dishService.updateWithFlavor(dishDto);
         return Result.success("修改菜品分类成功！");
+    }
+
+    @DeleteMapping
+    public Result<String> deleteDish(@RequestParam("ids") List<Long> ids) {
+        log.info("ids：{}",ids);
+        dishService.removeWithFlavor(ids);
+        return Result.success("删除成功！");
+    }
+
+    @PostMapping("/status/{type}")
+    public Result<String> updateStatus(@PathVariable("type") int status, @Param("ids") Long[] ids) {
+        dishService.updateStatus(status, ids);
+        return Result.success("修改状态成功！");
+    }
+
+    @GetMapping("/list")
+    public Result<List<Dish>> list(Dish dish) {
+        log.info("Dish：{}", dish);
+        //构造查询条件
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        //添加条件，查询状态为1（起售状态）的菜品
+        queryWrapper.eq(Dish::getStatus, 1);
+        //添加排序条件
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        List<Dish> list = dishService.list(queryWrapper);
+        return Result.success(list);
     }
 }

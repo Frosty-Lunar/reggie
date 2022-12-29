@@ -5,16 +5,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lengyue.dto.DishDto;
 import com.lengyue.entity.Dish;
 import com.lengyue.entity.DishFlavor;
+import com.lengyue.exception.CustomException;
 import com.lengyue.mapper.DishMapper;
 import com.lengyue.service.DishFlavorService;
 import com.lengyue.service.DishService;
+import com.lengyue.service.SetmealDishService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,5 +67,32 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             return item;
         }).collect(Collectors.toList());
         dishFlavorService.saveBatch(flavors);
+    }
+
+    @Override
+    public void updateStatus(int status, Long[] ids) {
+        for (int i = 0; i < ids.length; i++) {
+            LambdaQueryWrapper<Dish> dishQueryWrapper = new LambdaQueryWrapper<>();
+            dishQueryWrapper.eq(Dish::getId, ids[i]);
+            Dish dish = getOne(dishQueryWrapper);
+            dish.setStatus(status);
+            updateById(dish);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeWithFlavor(List<Long> ids) {
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(Dish::getId, ids);
+        lambdaQueryWrapper.eq(Dish::getStatus, 1);
+        long count = count(lambdaQueryWrapper);
+        if (count > 0) {
+            throw new CustomException("菜品正在售卖中，不能删除！");
+        }
+        this.removeByIds(ids);
+        LambdaQueryWrapper<DishFlavor> lambdaWrapper = new LambdaQueryWrapper<>();
+        lambdaWrapper.in(DishFlavor::getDishId, ids);
+        dishFlavorService.remove(lambdaWrapper);
     }
 }
