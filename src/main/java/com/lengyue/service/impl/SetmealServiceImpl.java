@@ -22,11 +22,12 @@ import java.util.stream.Collectors;
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
     @Autowired
     private SetmealDishService setmealDishService;
+
     @Override
     public void saveWithDish(SetmealDto setmealDto) {
         save(setmealDto);
         List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
-        setmealDishes.stream().map(item->{
+        setmealDishes.stream().map(item -> {
             item.setSetmealId(setmealDto.getId());
             return item;
         }).collect(Collectors.toList());
@@ -37,16 +38,28 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     @Transactional(rollbackFor = Exception.class)
     public void removeWithDish(List<Long> ids) {
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper();
-        queryWrapper.in(Setmeal::getId,ids);
-        queryWrapper.eq(Setmeal::getStatus,1);
+        queryWrapper.in(Setmeal::getId, ids);
+        queryWrapper.eq(Setmeal::getStatus, 1);
         long count = count(queryWrapper);
-        if(count > 0){
+        if (count > 0) {
             //如果不能删除，抛出一个业务异常
             throw new CustomException("套餐正在售卖中，不能删除");
         }
         this.removeByIds(ids);
         LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
+        lambdaQueryWrapper.in(SetmealDish::getSetmealId, ids);
         setmealDishService.remove(lambdaQueryWrapper);
+    }
+
+    @Override
+    public void updateStatus(int status, List<Long> ids) {
+        LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(Setmeal::getId, ids);
+        List<Setmeal> list = list(lambdaQueryWrapper);
+        list = list.stream().map(item -> {
+            item.setStatus(status);
+            return item;
+        }).collect(Collectors.toList());
+        updateBatchById(list);
     }
 }

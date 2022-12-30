@@ -100,6 +100,12 @@ public class SetmealController {
         return Result.success("套餐数据删除成功");
     }
 
+    @PostMapping("/status/{status}")
+    public Result<String> updateStatus(@PathVariable("status") int status, @RequestParam("ids") List<Long> ids) {
+        setmealService.updateStatus(status, ids);
+        return Result.success("修改状态成功！");
+    }
+
     @GetMapping("/list")
     public Result<List<Setmeal>> list(Setmeal setmeal) {
         log.info("setmeal:{}", setmeal);
