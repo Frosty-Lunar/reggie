@@ -27,7 +27,10 @@ public class LoginCheckFielter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "front/**",
+                "/front/**",
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
         String requestUri = request.getRequestURI();
         if (checkUri(sideTrips, requestUri)) {
@@ -37,6 +40,12 @@ public class LoginCheckFielter implements Filter {
         Long employeeId = (Long) request.getSession().getAttribute("employeeId");
         if (employeeId != null) {
             BaseContext.setCurrentId(employeeId);
+            filterChain.doFilter(request, response);
+            return;
+        }
+        Long userId = (Long) request.getSession().getAttribute("user");
+        if (userId != null) {
+            BaseContext.setCurrentId(userId);
             filterChain.doFilter(request, response);
             return;
         }
