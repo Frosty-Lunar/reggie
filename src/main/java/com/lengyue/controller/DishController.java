@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,7 +94,7 @@ public class DishController {
 
     @DeleteMapping
     public Result<String> deleteDish(@RequestParam("ids") List<Long> ids) {
-        log.info("ids：{}",ids);
+        log.info("ids：{}", ids);
         dishService.removeWithFlavor(ids);
         return Result.success("删除成功！");
     }
@@ -105,7 +106,7 @@ public class DishController {
     }
 
     @GetMapping("/list")
-    public Result<List<Dish>> list(Dish dish) {
+    public Result<List<DishDto>> list(Dish dish) {
         log.info("Dish：{}", dish);
         //构造查询条件
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
@@ -114,7 +115,18 @@ public class DishController {
         queryWrapper.eq(Dish::getStatus, 1);
         //添加排序条件
         queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-        List<Dish> list = dishService.list(queryWrapper);
-        return Result.success(list);
+        List<Dish> dishList = dishService.list(queryWrapper);
+        List<DishDto> dishDtoList;
+        dishDtoList = dishList.stream().map(item -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item, dishDto);
+            Long dishId = item.getId();
+            LambdaQueryWrapper<DishFlavor> queryWrap = new LambdaQueryWrapper<>();
+            queryWrap.eq(DishFlavor::getDishId, dishId);
+            List<DishFlavor> flavors = dishFlavorService.list(queryWrap);
+            dishDto.setFlavors(flavors);
+            return dishDto;
+        }).collect(Collectors.toList());
+        return Result.success(dishDtoList);
     }
 }
