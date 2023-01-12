@@ -46,6 +46,7 @@ public class UserController {
                 user = new User();
                 user.setPhone(phone);
                 user.setStatus(1);
+                user.setName("林之谜");
                 userService.save(user);
             }
             httpSession.setAttribute("user", user.getId());
