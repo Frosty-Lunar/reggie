@@ -73,6 +73,7 @@ public class DishController {
         BeanUtils.copyProperties(pageInfo, pageDtoInfo, "records");
         List<DishDto> dishDtoList = pageInfo.getRecords().stream().map(item -> {
             DishDto dishDto = new DishDto();
+
             BeanUtils.copyProperties(item, dishDto);
             Long categoryId = item.getCategoryId();
             Category category = categoryService.getById(categoryId);

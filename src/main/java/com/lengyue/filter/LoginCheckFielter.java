@@ -30,7 +30,11 @@ public class LoginCheckFielter implements Filter {
                 "/front/**",
                 "/common/**",
                 "/user/sendMsg",
-                "/user/login"
+                "/user/login",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
         String requestUri = request.getRequestURI();
         if (checkUri(sideTrips, requestUri)) {
