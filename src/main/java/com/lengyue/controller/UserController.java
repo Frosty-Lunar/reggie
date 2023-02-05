@@ -1,11 +1,9 @@
 package com.lengyue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.lengyue.commons.Result;
 import com.lengyue.entity.User;
 import com.lengyue.service.UserService;
-import com.lengyue.utils.SMSUtils;
 import com.lengyue.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +71,7 @@ public class UserController {
         }
         return Result.error("请重新输入手机号！");
     }
+
 
 
 }

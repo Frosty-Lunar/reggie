@@ -6,14 +6,10 @@ import com.lengyue.commons.Result;
 import com.lengyue.entity.Orders;
 import com.lengyue.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 订单
@@ -39,7 +35,7 @@ public class OrderController {
         return Result.success("下单成功");
     }
 
-    @GetMapping("/page")
+    @GetMapping("/userPage")
     public Result<Page> listPage(@Param("page") int page, @Param("pageSize") int pageSize, @Param("number") Long number, @Param("beginTime") String beginTime, @Param("endTime") String endTime) {
         log.info("当前页：{}，页面大小：{}", page, pageSize);
         log.info("订单号：{}", number);
