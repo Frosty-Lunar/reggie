@@ -2,23 +2,25 @@ package com.lengyue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lengyue.commons.BaseResponse;
+import com.lengyue.commons.ErrorCode;
 import com.lengyue.commons.Result;
+import com.lengyue.commons.ResultUtils;
 import com.lengyue.entity.Employee;
+import com.lengyue.exception.BusinessException;
 import com.lengyue.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.List;
 
 
 /**
- * 员工控制器
+ * 员工控制层
  *
  * @author 陌年
  * @date 2022/12/20
@@ -34,40 +36,36 @@ public class EmployeeController {
      * 登录功能实现
      *
      * @param request  请求,主要用来将id存入session作用域
-     * @param employee 员工
+     * @param employee 员工对象
      * @return {@link Result}<{@link Employee}>
      */
     @PostMapping("/login")
-    public Result<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
-        String password = employee.getPassword();
-        password = DigestUtils.md5DigestAsHex(password.getBytes());
+    public BaseResponse<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
+        if (employee == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
         String username = employee.getUsername();
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Employee::getUsername, username);
-        Employee emp = employeeService.getOne(queryWrapper);
-        if (emp == null) {
-            return Result.error("未找到用户名");
+        String password = employee.getPassword();
+        if (StringUtils.isAnyBlank(username, password)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名或密码不得为空！");
         }
-        if (!emp.getPassword().equals(password)) {
-            return Result.error("密码错误");
+        Employee employeeLogin = employeeService.employeeLogin(username, password, request);
+        if (employeeLogin == null) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "登录失败！");
         }
-        if (emp.getStatus() == 0) {
-            return Result.error("账户状态异常");
-        }
-        request.getSession().setAttribute("employeeId", emp.getId());
-        return Result.success(emp);
+        return ResultUtils.success(employee);
     }
 
     /**
      * 注销登录
      *
-     * @param request 请求,主要用于清理session中的id
+     * @param request 请求,主要用于清理session中的员工ID
      * @return {@link Result}<{@link String}>
      */
     @PostMapping("/logout")
     public Result<String> logout(HttpServletRequest request) {
         request.getSession().removeAttribute("employeeId");
-        return Result.success("退出成功");
+        return Result.success("退出成功！");
     }
 
     /**
@@ -97,7 +95,7 @@ public class EmployeeController {
     public Result<Page> employeeList(@Param("page") int page, @Param("pageSize") int pageSize, @Param("name") String name) {
         Page<Employee> pageInfo = new Page<>(page, pageSize);
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName, name);
+        queryWrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
         Page<Employee> employeePage = employeeService.page(pageInfo, queryWrapper);
         return Result.success(employeePage);
     }

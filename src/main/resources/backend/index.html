@@ -12,10 +12,6 @@
     <link rel="stylesheet" href="styles/index.css"/>
     <link rel="stylesheet" href="styles/icon/iconfont.css"/>
     <style>
-        .body {
-            min-width: 1366px;
-        }
-
         .app-main {
             height: calc(100% - 64px);
         }
@@ -36,7 +32,6 @@
                 <!-- <img src="images/logo.png" width="122.5" alt="" /> -->
                 <img src="images/login/login-logo.png" alt="" style="width: 117px; height: 32px"/>
             </div>
-
             <el-scrollbar wrap-class="scrollbar-wrapper">
                 <el-menu
                         :default-active="defAct"
@@ -120,10 +115,6 @@
                 menuActived: '2',
                 userInfo: {},
                 menuList: [
-                    // {
-                    //   id: '1',
-                    //   name: '门店管理',
-                    //   children: [
                     {
                         id: '2',
                         name: '员工管理',
@@ -154,8 +145,6 @@
                         url: 'page/order/list.html',
                         icon: 'icon-order'
                     }
-                    //   ],
-                    // },
                 ],
                 iframeUrl: 'page/member/list.html',
                 headTitle: '员工管理',
@@ -167,6 +156,7 @@
         computed: {},
         created() {
             const userInfo = window.localStorage.getItem('userInfo')
+            console.log("用户信息：" + userInfo)
             if (userInfo) {
                 this.userInfo = JSON.parse(userInfo)
             }
@@ -189,10 +179,7 @@
                 })
             },
             goBack() {
-                // window.location.href = 'javascript:history.go(-1)'
                 const menu = this.menuList.find(item => item.id === this.menuActived)
-                // this.goBackFlag = false
-                // this.headTitle = menu.name
                 this.menuHandle(menu, false)
             },
             menuHandle(item, goBackFlag) {

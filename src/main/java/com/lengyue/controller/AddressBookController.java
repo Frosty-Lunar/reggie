@@ -2,14 +2,12 @@ package com.lengyue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lengyue.commons.BaseContext;
 import com.lengyue.commons.Result;
 import com.lengyue.entity.AddressBook;
 import com.lengyue.service.AddressBookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,6 +50,16 @@ public class AddressBookController {
         //SQL:update address_book set is_default = 1 where id = ?
         addressBookService.updateById(addressBook);
         return Result.success(addressBook);
+    }
+
+    /**
+     * 修改地址
+     */
+    @PutMapping
+    public Result<String> updateAddressBook(@RequestBody AddressBook addressBook) {
+        log.info("addressBookUpdate:{}", addressBook);
+        addressBookService.updateById(addressBook);
+        return Result.success("修改地址成功！");
     }
 
     /**

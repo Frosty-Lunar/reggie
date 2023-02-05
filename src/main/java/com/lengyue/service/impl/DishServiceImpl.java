@@ -2,14 +2,14 @@ package com.lengyue.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lengyue.commons.ErrorCode;
 import com.lengyue.dto.DishDto;
 import com.lengyue.entity.Dish;
 import com.lengyue.entity.DishFlavor;
-import com.lengyue.exception.CustomException;
+import com.lengyue.exception.BusinessException;
 import com.lengyue.mapper.DishMapper;
 import com.lengyue.service.DishFlavorService;
 import com.lengyue.service.DishService;
-import com.lengyue.service.SetmealDishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,7 +88,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         lambdaQueryWrapper.eq(Dish::getStatus, 1);
         long count = count(lambdaQueryWrapper);
         if (count > 0) {
-            throw new CustomException("菜品正在售卖中，不能删除！");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"菜品正在售卖中，不能删除！");
         }
         this.removeByIds(ids);
         LambdaQueryWrapper<DishFlavor> lambdaWrapper = new LambdaQueryWrapper<>();

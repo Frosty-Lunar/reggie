@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -45,16 +44,17 @@ public class DishController {
 
     @PostMapping
     public Result<String> save(@RequestBody DishDto dishDto) {
-        log.info("dish dto：{}", dishDto);
+        log.info("新增菜品信息：{}", dishDto);
         dishService.saveWithDishFlavor(dishDto);
         String key = "dish:" + dishDto.getCategoryId() + ":" + dishDto.getStatus();
         redisTemplate.delete(key);
+        log.info("新增菜品信息成功！");
         return Result.success("新增菜品成功");
     }
 
     @GetMapping("{id}")
     public Result<DishDto> getDishById(@PathVariable("id") Long id) {
-        log.info("id：{}", id);
+        log.info("菜品ID：{}", id);
         Dish dish = dishService.getById(id);
         DishDto dishDto = new DishDto();
         BeanUtils.copyProperties(dish, dishDto);
@@ -66,6 +66,7 @@ public class DishController {
         dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dish.getId());
         List<DishFlavor> dishFlavors = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
         dishDto.setFlavors(dishFlavors);
+        log.info("菜品信息：{}",dishDto);
         return Result.success(dishDto);
     }
 
@@ -147,7 +148,7 @@ public class DishController {
             dishDto.setFlavors(flavors);
             return dishDto;
         }).collect(Collectors.toList());
-        redisTemplate.opsForValue().set(key,dishDtoList,60, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(key, dishDtoList, 60, TimeUnit.MINUTES);
         return Result.success(dishDtoList);
     }
 }

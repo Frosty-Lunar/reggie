@@ -2,14 +2,19 @@ package com.lengyue.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lengyue.commons.ErrorCode;
+import com.lengyue.dto.DishDto;
 import com.lengyue.dto.SetmealDto;
+import com.lengyue.entity.Dish;
 import com.lengyue.entity.Setmeal;
 import com.lengyue.entity.SetmealDish;
-import com.lengyue.exception.CustomException;
+import com.lengyue.exception.BusinessException;
 import com.lengyue.mapper.SetmealMapper;
+import com.lengyue.service.DishService;
 import com.lengyue.service.SetmealDishService;
 import com.lengyue.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +27,8 @@ import java.util.stream.Collectors;
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
     @Autowired
     private SetmealDishService setmealDishService;
+    @Autowired
+    private DishService dishService;
 
     @Override
     public void saveWithDish(SetmealDto setmealDto) {
@@ -43,7 +50,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         long count = count(queryWrapper);
         if (count > 0) {
             //如果不能删除，抛出一个业务异常
-            throw new CustomException("套餐正在售卖中，不能删除");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"套餐正在售卖中，不能删除");
         }
         this.removeByIds(ids);
         LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -61,5 +68,21 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
             return item;
         }).collect(Collectors.toList());
         updateBatchById(list);
+    }
+
+    @Override
+    public List<DishDto> getDishBySetMealId(Long id) {
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishLambdaQueryWrapper.eq(id != null, SetmealDish::getSetmealId, id);
+        List<SetmealDish> list = setmealDishService.list(setmealDishLambdaQueryWrapper);
+        List<DishDto> dishDtoList = list.stream().map(item -> {
+            Long dishId = item.getDishId();
+            Dish dish = dishService.getById(dishId);
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(dish, dishDto);
+            dishDto.setCopies(item.getCopies());
+            return dishDto;
+        }).collect(Collectors.toList());
+        return dishDtoList;
     }
 }

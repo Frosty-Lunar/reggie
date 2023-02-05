@@ -3,14 +3,14 @@ package com.lengyue.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lengyue.commons.Result;
+import com.lengyue.dto.DishDto;
 import com.lengyue.dto.SetmealDto;
 import com.lengyue.entity.Category;
 import com.lengyue.entity.Setmeal;
 import com.lengyue.service.CategoryService;
-import com.lengyue.service.SetmealDishService;
 import com.lengyue.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,9 +33,6 @@ public class SetmealController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private SetmealDishService setmealDishService;
-
     /**
      * 新增套餐
      *
@@ -45,9 +42,7 @@ public class SetmealController {
     @PostMapping
     public Result<String> save(@RequestBody SetmealDto setmealDto) {
         log.info("套餐信息：{}", setmealDto);
-
         setmealService.saveWithDish(setmealDto);
-
         return Result.success("新增套餐成功");
     }
 
@@ -63,15 +58,11 @@ public class SetmealController {
     public Result<Page> page(int page, int pageSize, String name) {
         Page<Setmeal> setmealPage = new Page<>(page, pageSize);
         Page<SetmealDto> setmealDtoPage = new Page<>(page, pageSize);
-
         LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
         setmealLambdaQueryWrapper.like(name != null, Setmeal::getName, name);
         setmealService.page(setmealPage, setmealLambdaQueryWrapper);
-
         BeanUtils.copyProperties(setmealPage, setmealDtoPage, "records");
-
         List<Setmeal> setmealPageRecords = setmealPage.getRecords();
-
         List<SetmealDto> list = setmealPageRecords.stream().map(item -> {
             SetmealDto setmealDto = new SetmealDto();
             BeanUtils.copyProperties(item, setmealDto);
@@ -116,5 +107,13 @@ public class SetmealController {
         queryWrapper.eq(null != setmeal.getStatus(), Setmeal::getStatus, setmeal.getStatus());
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
         return Result.success(setmealService.list(queryWrapper));
+    }
+
+    @GetMapping("/dish/{id}")
+    public Result<List<DishDto>> list(@PathVariable("id") Long id) {
+        log.info("setmealId:{}", id);
+        List<DishDto> dishList = setmealService.getDishBySetMealId(id);
+        log.info(dishList.toString());
+        return Result.success(dishList);
     }
 }

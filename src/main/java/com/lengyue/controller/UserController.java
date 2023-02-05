@@ -1,12 +1,13 @@
 package com.lengyue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lengyue.commons.BaseContext;
 import com.lengyue.commons.Result;
 import com.lengyue.entity.User;
 import com.lengyue.service.UserService;
 import com.lengyue.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +30,6 @@ public class UserController {
 
     @PostMapping("/login")
     public Result<Object> login(@RequestBody Map map, HttpSession httpSession) {
-
-        log.info(map.toString());
         //获取手机号
         String phone = map.get("phone").toString();
         //获取验证码
@@ -72,6 +71,12 @@ public class UserController {
         return Result.error("请重新输入手机号！");
     }
 
+    @PostMapping("loginout")
+    public Result<String> loginout() {
+        // 移除当前用户
+        BaseContext.remove();
+        return Result.success("注销用户成功！");
+    }
 
 
 }

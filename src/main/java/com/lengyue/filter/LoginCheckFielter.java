@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 登录检查fielter
+ * 拦截器
  *
  * @author 陌年
  * @date 2022/12/20

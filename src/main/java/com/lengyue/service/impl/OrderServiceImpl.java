@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lengyue.commons.BaseContext;
+import com.lengyue.commons.ErrorCode;
 import com.lengyue.entity.*;
-import com.lengyue.exception.CustomException;
+import com.lengyue.exception.BusinessException;
 import com.lengyue.mapper.OrderMapper;
 import com.lengyue.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         List<ShoppingCart> shoppingCarts = shoppingCartService.list(wrapper);
 
         if (shoppingCarts == null || shoppingCarts.size() == 0) {
-            throw new CustomException("购物车为空，不能下单");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"购物车为空，不能下单");
         }
 
         //查询用户数据
@@ -61,7 +62,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         Long addressBookId = orders.getAddressBookId();
         AddressBook addressBook = addressBookService.getById(addressBookId);
         if (addressBook == null) {
-            throw new CustomException("用户地址信息有误，不能下单");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"用户地址信息有误，不能下单");
         }
 
         long orderId = IdWorker.getId();//订单号
