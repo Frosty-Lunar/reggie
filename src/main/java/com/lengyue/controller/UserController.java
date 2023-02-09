@@ -77,6 +77,4 @@ public class UserController {
         BaseContext.remove();
         return Result.success("注销用户成功！");
     }
-
-
 }

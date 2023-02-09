@@ -3,6 +3,7 @@ package com.lengyue.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lengyue.commons.ErrorCode;
+import com.lengyue.constant.EmployeeConstant;
 import com.lengyue.entity.Employee;
 import com.lengyue.exception.BusinessException;
 import com.lengyue.mapper.EmployeeMapper;
@@ -37,7 +38,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
             log.error("员工登录失败，账户状态异常！");
             throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "员工登录失败，账户状态异常！");
         }
-        request.getSession().setAttribute("employeeId", employee.getId());
+        request.getSession().setAttribute(EmployeeConstant.EMPLOYEE_LOGIN_ID, employee.getId());
         return employee;
     }
 }

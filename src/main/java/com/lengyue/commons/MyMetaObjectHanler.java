@@ -5,6 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+
+/**
+ * 我元对象hanler
+ *
+ * @author 陌年
+ * @date 2023/02/09
+ */
 @Component
 @Slf4j
 public class MyMetaObjectHanler implements MetaObjectHandler {

@@ -14,6 +14,9 @@ import java.util.List;
 
 /**
  * 地址簿管理
+ *
+ * @author 陌年
+ * @date 2023/02/09
  */
 @Slf4j
 @RestController
@@ -43,11 +46,8 @@ public class AddressBookController {
         LambdaUpdateWrapper<AddressBook> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(AddressBook::getUserId, BaseContext.getCurrentId());
         wrapper.set(AddressBook::getIsDefault, 0);
-        //SQL:update address_book set is_default = 0 where user_id = ?
         addressBookService.update(wrapper);
-
         addressBook.setIsDefault(1);
-        //SQL:update address_book set is_default = 1 where id = ?
         addressBookService.updateById(addressBook);
         return Result.success(addressBook);
     }

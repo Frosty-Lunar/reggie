@@ -49,17 +49,45 @@ public class OrderController {
         log.info("订单号：{}", number);
         log.info("开始时间：{}，结束时间：{}", beginTime, endTime);
         Page<Orders> orders = new Page<>(page, pageSize);
-        Page<OrderDto> orderDto= new Page<>(page, pageSize);
+        Page<OrderDto> orderDto = new Page<>(page, pageSize);
         LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
         ordersLambdaQueryWrapper.eq(number != null, Orders::getId, number);
         ordersLambdaQueryWrapper.between(beginTime != null && endTime != null, Orders::getOrderTime, beginTime, endTime);
         ordersLambdaQueryWrapper.orderByDesc(Orders::getOrderTime).orderByDesc(Orders::getAmount);
         orders = orderService.page(orders, ordersLambdaQueryWrapper);
-        BeanUtils.copyProperties(orders,orderDto,"records");
+        BeanUtils.copyProperties(orders, orderDto, "records");
         List<Orders> records = orders.getRecords();
         List<OrderDto> orderDtoList = records.stream().map(item -> {
             Long ordersId = item.getId();
             System.out.println(ordersId);
+            LambdaQueryWrapper<OrderDetail> lambdaQueryWrap = new LambdaQueryWrapper<>();
+            lambdaQueryWrap.eq(OrderDetail::getOrderId, ordersId);
+            List<OrderDetail> orderDetails = orderDetailService.list(lambdaQueryWrap);
+            OrderDto orderDto_ = new OrderDto();
+            BeanUtils.copyProperties(item, orderDto_);
+            orderDto_.setOrderDetails(orderDetails);
+            return orderDto_;
+        }).collect(Collectors.toList());
+        orderDto.setRecords(orderDtoList);
+        return Result.success(orderDto);
+    }
+
+    @GetMapping("/page")
+    public Result<Page> pageResult(@Param("page") int page, @Param("pageSize") int pageSize, @Param("number") Long number, @Param("beginTime") String beginTime, @Param("endTime") String endTime) {
+        log.info("当前页：{}，页面大小：{}", page, pageSize);
+        log.info("订单号：{}", number);
+        log.info("开始时间：{}，结束时间：{}", beginTime, endTime);
+        Page<Orders> orders = new Page<>(page, pageSize);
+        Page<OrderDto> orderDto = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        ordersLambdaQueryWrapper.eq(number != null, Orders::getId, number);
+        ordersLambdaQueryWrapper.between(beginTime != null && endTime != null, Orders::getOrderTime, beginTime, endTime);
+        ordersLambdaQueryWrapper.orderByDesc(Orders::getOrderTime).orderByDesc(Orders::getAmount);
+        orders = orderService.page(orders, ordersLambdaQueryWrapper);
+        BeanUtils.copyProperties(orders, orderDto, "records");
+        List<Orders> records = orders.getRecords();
+        List<OrderDto> orderDtoList = records.stream().map(item -> {
+            Long ordersId = item.getId();
             LambdaQueryWrapper<OrderDetail> lambdaQueryWrap = new LambdaQueryWrapper<>();
             lambdaQueryWrap.eq(OrderDetail::getOrderId, ordersId);
             List<OrderDetail> orderDetails = orderDetailService.list(lambdaQueryWrap);
